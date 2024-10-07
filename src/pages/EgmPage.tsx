@@ -1,15 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 
 import EgmChart from "./components/egm-chart/EgmChart";
-import { useFileUpload } from "./useFileUpload";
 import { useParseEgmData } from "./useParseEgmData";
+import FileUpload from "./components/file-upload/FileUpload";
 
 const EgmPage: React.FC = () => {
-  const { handleFileUpload, file } = useFileUpload();
+  const [file, setFile] = useState<File | null>(null);
   const { data, isLoading, updateTimeRange } = useParseEgmData({ file });
 
   if (!file) {
-    return <input type="file" accept=".csv" onChange={handleFileUpload} />;
+    return <FileUpload file={file} onFileUpload={setFile} />;
   }
   if (data.length === 0 && isLoading) {
     return <div>loading...</div>;

@@ -23,6 +23,7 @@ export default function EgmChartButtons({
   return (
     <Stack
       sx={{
+        mt: 2,
         px: 4,
         flexDirection: "row",
         justifyContent: "space-between",

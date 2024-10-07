@@ -6,7 +6,7 @@ import FileUpload from "./components/file-upload/FileUpload";
 
 const EgmPage: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
-  const { data, isLoading, updateTimeRange, hasNextData, hasPrevData } =
+  const { data, isLoading, updateTimeRange, isBeginningOfFile } =
     useParseEgmData({ file });
 
   if (!file) {
@@ -17,8 +17,7 @@ const EgmPage: React.FC = () => {
   }
   return (
     <EgmChart
-      isNextEnabled={hasNextData}
-      isPrevEnabled={hasPrevData}
+      isPrevEnabled={!isBeginningOfFile}
       egm={data}
       onChangeTimeRange={updateTimeRange}
       isLoading={isLoading}

@@ -18,13 +18,11 @@ const EgmChart = ({
   egm,
   onChangeTimeRange,
   isLoading,
-  isNextEnabled,
   isPrevEnabled,
 }: {
   egm: Egm;
   onChangeTimeRange: (range: TimeRange) => void;
   isLoading: boolean;
-  isNextEnabled: boolean;
   isPrevEnabled: boolean;
 }) => {
   const {
@@ -125,7 +123,7 @@ const EgmChart = ({
       </Card>
       {!!timeRange && (
         <EgmChartButtons
-          isNextEnabled={isNextEnabled && !isLoading}
+          isNextEnabled={!isLoading}
           isPrevEnabled={isPrevEnabled && !isLoading}
           timeRange={timeRange}
           onChangeTimeRange={onChangeTimeRange}

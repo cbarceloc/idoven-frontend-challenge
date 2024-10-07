@@ -5,26 +5,27 @@ import { Egm, EgmSample, TimeRange } from "../types";
 const CHUNK_SIZE = 1024 * 1024 * 1; // 1MB
 const SAMPLES_PER_PAGE = 1000;
 
+// when we search for a time range, we can be in these states:
+type TimeRangeState =
+  | "beforeRange"
+  | "firstSamplesInRange"
+  | "allMiddleSamplesInRange"
+  | "someMiddleSamplesInRange"
+  | "inExactRange"
+  | "lastSamplesInRange"
+  | "afterRange";
+
 export function useParseEgmData({ file }: { file: File | null }): {
   data: Egm;
   isLoading: boolean;
   updateTimeRange: (range: TimeRange) => void;
-  hasPrevData: boolean;
-  hasNextData: boolean;
+  isBeginningOfFile: boolean;
 } {
-  const initialTime = useRef<number>(0);
+  const initialTime = useRef<number | undefined>();
   const [data, setData] = useState<Egm>([]);
-  const [hasPrevData, setHasPrevData] = useState(false);
-  const [hasNextData, setHasNextData] = useState(true);
 
   const [isLoading, setIsLoading] = useState(false);
 
-  function isGoingForward(timeRange: TimeRange) {
-    return timeRange[0] > data[0].Time;
-  }
-  function isGoingBackward(timeRange: TimeRange) {
-    return timeRange[0] < data[0].Time;
-  }
   function setSampledData(egmData: EgmSample[]) {
     if (!egmData.length) return;
     if (egmData.length <= SAMPLES_PER_PAGE) {
@@ -38,7 +39,55 @@ export function useParseEgmData({ file }: { file: File | null }): {
     }
     setData(sampledData);
   }
+  function abortParsing(parser: Papa.Parser) {
+    parser.abort();
+    setIsLoading(false);
+  }
+  function getIsBeginningOfFile() {
+    if (initialTime.current === undefined) return true;
+    return data[0].Time <= initialTime.current;
+  }
+  function getDataInTimeRange(timeRange: TimeRange, egmData: Egm) {
+    return egmData.filter(
+      (val) => val.Time >= timeRange[0] && val.Time <= timeRange[1]
+    );
+  }
 
+  function getTimeRangeState(
+    timeRange: TimeRange | null,
+    data: Egm
+  ): TimeRangeState {
+    if (!timeRange) return "inExactRange";
+    const [start, end] = timeRange;
+    const lastSample = data[data.length - 1];
+    const firstSample = data[0];
+
+    console.log("data", data);
+    console.log("timeRange", timeRange);
+
+    if (firstSample.Time === start && lastSample.Time === end) {
+      return "inExactRange";
+    } else if (lastSample.Time < start) {
+      return "beforeRange";
+    } else if (firstSample.Time > end) {
+      return "afterRange";
+    } else if (
+      firstSample.Time <= start &&
+      lastSample.Time >= start &&
+      lastSample.Time <= end
+    ) {
+      return "lastSamplesInRange";
+    } else if (
+      firstSample.Time >= start &&
+      firstSample.Time <= end &&
+      lastSample.Time >= end
+    ) {
+      return "firstSamplesInRange";
+    } else if (firstSample.Time > start && lastSample.Time < end) {
+      return "allMiddleSamplesInRange";
+    }
+    return "someMiddleSamplesInRange";
+  }
   const parseData = (timeRange?: TimeRange) => {
     const accumulativeData: Egm = [];
     if (!file) return;
@@ -49,65 +98,54 @@ export function useParseEgmData({ file }: { file: File | null }): {
       skipEmptyLines: true,
       chunkSize: CHUNK_SIZE,
       worker: true,
+
       fastMode: true,
       chunk: (results: ParseResult<EgmSample>, parser: Papa.Parser) => {
-        if (!timeRange) {
-          // if we have no timeRange, show all the data from first chunk
-          setSampledData(results.data);
+        if (initialTime.current === undefined) {
+          // set the initial time for the first chunk
           initialTime.current = results.data[0].Time;
-          setIsLoading(false);
-          parser.abort();
-        } else {
-          // when there is data and a time range, show only the data in the time range
-          const newData = results.data.filter(
-            (val) => val.Time >= timeRange[0] && val.Time <= timeRange[1]
-          );
-
-          if (newData.length) {
-            // if we have data, we need to accumulate it until we reach the end of the time range at some chunk
+        }
+        const timeRangeState = getTimeRangeState(
+          timeRange || null,
+          results.data
+        );
+        let newData: EgmSample[] = [];
+        switch (timeRangeState) {
+          case "inExactRange":
+            // the current data is the exact time range we need
+            setSampledData(results.data);
+            abortParsing(parser);
+            break;
+          case "beforeRange":
+            // if the data is before the time range, we can skip this chunk
+            break;
+          case "lastSamplesInRange":
+            // we start to find the first samples in the time range
+            newData = getDataInTimeRange(timeRange!, results.data);
             accumulativeData.push(...newData);
-            if (isGoingBackward(timeRange)) {
-              if (
-                timeRange[0] <= initialTime.current &&
-                results.data[0].Time <= initialTime.current &&
-                newData.length > 1
-              ) {
-                // we reached the start of the file
-                setSampledData(results.data);
-                setHasPrevData(false);
-                setIsLoading(false);
-                parser.abort();
-              }
-            }
-          } else {
-            if (isGoingForward(timeRange)) {
-              // it means we are going forward in time
-              setHasPrevData(true);
-              if (results.data[results.data.length - 1].Time >= timeRange[1]) {
-                // we already reached the end of the time range desired
-                setSampledData(accumulativeData);
-                setIsLoading(false);
-                parser.abort();
-              } else if (results.data.length === 0) {
-                // we reached the end of the file
-                if (accumulativeData.length > 0) {
-                  setSampledData(results.data);
-                }
-                setHasNextData(false);
-                setIsLoading(false);
-                parser.abort();
-              }
-            } else if (isGoingBackward(timeRange)) {
-              // it means we are going backward in time (we selected a time range that is before the current data)
-              setHasNextData(true);
-              if (results.data[0].Time >= timeRange[1]) {
-                // we already reached the start of the time range desired
-                setSampledData(accumulativeData);
-                setIsLoading(false);
-                parser.abort();
-              }
-            }
-          }
+            break;
+          case "allMiddleSamplesInRange":
+            // all the samples belong to the time range, but we need to wait for the last samples to show up
+            accumulativeData.push(...results.data);
+            break;
+          case "firstSamplesInRange":
+            // we finally found the last samples in the time range
+            newData = getDataInTimeRange(timeRange!, results.data);
+            accumulativeData.push(...newData);
+            setSampledData(accumulativeData);
+            abortParsing(parser);
+            break;
+          case "someMiddleSamplesInRange":
+            // if all the time range is in the data, we can abort the parsing
+            // we can abort the parsing as we have the whole time range
+            newData = getDataInTimeRange(timeRange!, results.data);
+            setSampledData(newData);
+            abortParsing(parser);
+            break;
+          case "afterRange":
+            // if the data is after the time range, we already have the data, we can abort the parsing
+            abortParsing(parser);
+            break;
         }
       },
       complete: function () {
@@ -129,5 +167,10 @@ export function useParseEgmData({ file }: { file: File | null }): {
     parseData();
   }, [file]);
 
-  return { data, isLoading, updateTimeRange, hasPrevData, hasNextData };
+  return {
+    data,
+    isLoading,
+    updateTimeRange,
+    isBeginningOfFile: getIsBeginningOfFile(),
+  };
 }

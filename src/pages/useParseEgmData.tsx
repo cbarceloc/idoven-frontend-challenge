@@ -5,13 +5,11 @@ import { useEffect, useState } from "react";
 const CHUNK_SIZE = 1024 * 1024 * 10; // 10MB
 const SAMPLES_PER_PAGE = 1000;
 
-export function useParseEgmData({
-  file,
-  timeRange,
-}: {
-  file: File | null;
-  timeRange: [number, number] | null;
-}): { data: Egm; isLoading: boolean } {
+export function useParseEgmData({ file }: { file: File | null }): {
+  data: Egm;
+  isLoading: boolean;
+  updateTimeRange: (range: [number, number]) => void;
+} {
   const [data, setData] = useState<Egm>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -28,7 +26,7 @@ export function useParseEgmData({
     }
     setData(sampledData);
   }
-  useEffect(() => {
+  function parseData(timeRange?: [number, number]) {
     const accumulativeData: Egm = [];
     if (!file) return;
     setIsLoading(true);
@@ -40,8 +38,8 @@ export function useParseEgmData({
       worker: true,
       fastMode: true,
       chunk: (results: ParseResult<EgmSample>, parser: Papa.Parser) => {
-        if (!data.length) {
-          // when there is still no data, show all the first chunk
+        if (!timeRange) {
+          // if we have no timeRange, show all the data from first chunk
           setSampledData(results.data);
           setIsLoading(false);
           parser.abort();
@@ -69,6 +67,16 @@ export function useParseEgmData({
         setIsLoading(false);
       },
     });
-  }, [timeRange, file]);
-  return { data, isLoading };
+  }
+  function updateTimeRange(timeRange: [number, number]) {
+    parseData(timeRange);
+  }
+
+  useEffect(() => {
+    if (!file) return;
+    setIsLoading(true);
+    parseData();
+  }, [file]);
+
+  return { data, isLoading, updateTimeRange };
 }

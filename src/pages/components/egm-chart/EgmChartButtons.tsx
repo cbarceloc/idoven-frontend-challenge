@@ -18,8 +18,6 @@ export default function EgmChartButtons({
   }
   function handleClickPrev() {
     const timeRangeDuration = getTimeDuration();
-    console.log("timeRangeDuration", timeRangeDuration);
-    console.log("timeRange", timeRange);
     onChangeTimeRange([timeRange[0] - timeRangeDuration, timeRange[0]]);
   }
   function handleClickNext() {

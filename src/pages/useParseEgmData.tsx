@@ -1,14 +1,15 @@
 import Papa, { ParseResult } from "papaparse";
 import { Egm, EgmSample } from "../domain/Egm";
 import { useEffect, useState } from "react";
+import { TimeRange } from "./types";
 
-const CHUNK_SIZE = 1024 * 1024 * 10; // 10MB
+const CHUNK_SIZE = 1024 * 1024 * 1; // 10MB
 const SAMPLES_PER_PAGE = 1000;
 
 export function useParseEgmData({ file }: { file: File | null }): {
   data: Egm;
   isLoading: boolean;
-  updateTimeRange: (range: [number, number]) => void;
+  updateTimeRange: (range: TimeRange) => void;
 } {
   const [data, setData] = useState<Egm>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -26,7 +27,8 @@ export function useParseEgmData({ file }: { file: File | null }): {
     }
     setData(sampledData);
   }
-  function parseData(timeRange?: [number, number]) {
+  function parseData(timeRange?: TimeRange) {
+    console.log("eeeee", timeRange);
     const accumulativeData: Egm = [];
     if (!file) return;
     setIsLoading(true);
@@ -68,7 +70,7 @@ export function useParseEgmData({ file }: { file: File | null }): {
       },
     });
   }
-  function updateTimeRange(timeRange: [number, number]) {
+  function updateTimeRange(timeRange: TimeRange) {
     parseData(timeRange);
   }
 

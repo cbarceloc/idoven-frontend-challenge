@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { CategoricalChartFunc } from "recharts/types/chart/generateCategoricalChart";
+import { TimeRange } from "./types";
 
 export function useChartZoom({
   xAxisDataKey,
@@ -8,7 +9,7 @@ export function useChartZoom({
 }: {
   xAxisDataKey: string;
   chartData: Record<string, number | null>[];
-  onNewZoom: (range: [number, number]) => void;
+  onNewZoom: (range: TimeRange) => void;
 }): {
   handleMouseDownInChart: CategoricalChartFunc;
   handleMouseUpInChart: CategoricalChartFunc;

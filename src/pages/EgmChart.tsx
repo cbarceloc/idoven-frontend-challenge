@@ -11,8 +11,9 @@ import {
 } from "recharts";
 import { useChartZoom } from "./useChartZoom";
 import { Egm } from "../domain/Egm";
+import { TimeRange } from "./types";
+import EgmButtons from "./EgmButtons";
 
-type TimeRange = [number, number];
 const EgmChart = ({
   egm,
   onChangeTimeRange,
@@ -33,7 +34,7 @@ const EgmChart = ({
     onNewZoom: onChangeTimeRange,
   });
   const timeRange = egm.length
-    ? [egm[0].Time, egm[egm.length - 1].Time]
+    ? ([egm[0].Time, egm[egm.length - 1].Time] as TimeRange)
     : undefined;
   return (
     <>
@@ -102,6 +103,12 @@ const EgmChart = ({
           {refArea && <ReferenceArea x1={refArea.left} x2={refArea.right} />}
         </LineChart>
       </ResponsiveContainer>
+      {!!timeRange && (
+        <EgmButtons
+          timeRange={timeRange}
+          onChangeTimeRange={onChangeTimeRange}
+        ></EgmButtons>
+      )}
     </>
   );
 };

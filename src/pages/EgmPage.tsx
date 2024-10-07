@@ -20,10 +20,7 @@ const EgmPage: React.FC = () => {
       isNextEnabled={hasNextData}
       isPrevEnabled={hasPrevData}
       egm={data}
-      onChangeTimeRange={(timerange) => {
-        console.log("onChangeTimeRange", timerange);
-        updateTimeRange(timerange);
-      }}
+      onChangeTimeRange={updateTimeRange}
       isLoading={isLoading}
     />
   );

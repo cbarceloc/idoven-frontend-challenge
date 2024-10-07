@@ -46,24 +46,17 @@ const EgmChart = ({
         <CardContent sx={{ position: "relative" }}>
           <ResponsiveContainer height={400}>
             <LineChart
-              stackOffset="sign"
               onMouseDown={handleMouseDownInChart}
               onMouseMove={handleMouseMoveInChart}
               onMouseUp={handleMouseUpInChart}
               width={730}
-              height={250}
               data={egm}
               margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
             >
               <CartesianGrid strokeDasharray="3 3" />
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis
-                allowDataOverflow
-                dataKey="Time"
-                type="number"
-                domain={timeRange}
-              />
-              <YAxis allowDataOverflow type="number" dataKey={"1"} id="1" />
+              <XAxis dataKey="Time" type="number" domain={timeRange} />
+              <YAxis />
               <Tooltip />
               <Legend />
               <Line

@@ -12,16 +12,20 @@ import {
 import { useChartZoom } from "./useChartZoom";
 import { Egm, TimeRange } from "../../../types";
 import EgmChartButtons from "./EgmChartButtons";
-import { CardContent, Card } from "@mui/material";
+import { CardContent, Card, Stack } from "@mui/material";
 
 const EgmChart = ({
   egm,
   onChangeTimeRange,
   isLoading,
+  isNextEnabled,
+  isPrevEnabled,
 }: {
   egm: Egm;
   onChangeTimeRange: (range: TimeRange) => void;
   isLoading: boolean;
+  isNextEnabled: boolean;
+  isPrevEnabled: boolean;
 }) => {
   const {
     handleMouseDownInChart,
@@ -39,10 +43,10 @@ const EgmChart = ({
   return (
     <div>
       <Card>
-        <CardContent>
-          {isLoading && <div>loading...</div>}
+        <CardContent sx={{ position: "relative" }}>
           <ResponsiveContainer height={400}>
             <LineChart
+              stackOffset="sign"
               onMouseDown={handleMouseDownInChart}
               onMouseMove={handleMouseMoveInChart}
               onMouseUp={handleMouseUpInChart}
@@ -107,10 +111,29 @@ const EgmChart = ({
               )}
             </LineChart>
           </ResponsiveContainer>
+          {isLoading && (
+            <Stack
+              sx={{
+                backgroundColor: "white",
+                opacity: 0.5,
+                justifyContent: "center",
+                alignItems: "center",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                position: "absolute",
+              }}
+            >
+              <div>loading chart...</div>
+            </Stack>
+          )}
         </CardContent>
       </Card>
       {!!timeRange && (
         <EgmChartButtons
+          isNextEnabled={isNextEnabled && !isLoading}
+          isPrevEnabled={isPrevEnabled && !isLoading}
           timeRange={timeRange}
           onChangeTimeRange={onChangeTimeRange}
         ></EgmChartButtons>

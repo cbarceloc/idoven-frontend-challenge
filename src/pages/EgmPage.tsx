@@ -1,6 +1,6 @@
 import React from "react";
 
-import EgmChart from "./EgmChart";
+import EgmChart from "./components/egm-chart/EgmChart";
 import { useFileUpload } from "./useFileUpload";
 import { useParseEgmData } from "./useParseEgmData";
 

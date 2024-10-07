@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { CategoricalChartFunc } from "recharts/types/chart/generateCategoricalChart";
-import { TimeRange } from "./types";
+import { TimeRange } from "../../../types";
 
 export function useChartZoom({
   xAxisDataKey,

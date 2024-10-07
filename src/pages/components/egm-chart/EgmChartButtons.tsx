@@ -1,8 +1,8 @@
 import { Stack } from "@mui/material";
-import { TimeRange } from "./types";
+import { TimeRange } from "../../../types";
 import Button from "@mui/material/Button";
 
-export default function EgmButtons({
+export default function EgmChartButtons({
   timeRange,
   onChangeTimeRange,
 }: {

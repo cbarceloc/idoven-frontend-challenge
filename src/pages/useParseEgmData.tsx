@@ -1,7 +1,6 @@
 import Papa, { ParseResult } from "papaparse";
-import { Egm, EgmSample } from "../domain/Egm";
 import { useEffect, useState } from "react";
-import { TimeRange } from "./types";
+import { Egm, EgmSample, TimeRange } from "../types";
 
 const CHUNK_SIZE = 1024 * 1024 * 1; // 10MB
 const SAMPLES_PER_PAGE = 1000;

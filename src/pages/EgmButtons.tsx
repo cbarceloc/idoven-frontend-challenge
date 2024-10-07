@@ -1,4 +1,6 @@
+import { Stack } from "@mui/material";
 import { TimeRange } from "./types";
+import Button from "@mui/material/Button";
 
 export default function EgmButtons({
   timeRange,
@@ -19,9 +21,19 @@ export default function EgmButtons({
     onChangeTimeRange([timeRange[1], timeRange[1] + timeRangeDuration]);
   }
   return (
-    <div>
-      <button onClick={handleClickPrev}>Prev</button>
-      <button onClick={handleClickNext}>Next</button>
-    </div>
+    <Stack
+      sx={{
+        px: 4,
+        flexDirection: "row",
+        justifyContent: "space-between",
+      }}
+    >
+      <Button onClick={handleClickPrev} variant="contained" sx={{ width: 200 }}>
+        Prev
+      </Button>
+      <Button onClick={handleClickNext} variant="contained" sx={{ width: 200 }}>
+        Next
+      </Button>
+    </Stack>
   );
 }

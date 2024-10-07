@@ -12,15 +12,22 @@
     "test": "vitest"
   },
   "dependencies": {
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "@fontsource/roboto": "^5.1.0",
+    "@mui/icons-material": "^6.1.2",
+    "@mui/material": "^6.1.2",
     "@types/lodash.debounce": "^4.0.9",
     "@types/lodash.throttle": "^4.1.9",
     "@types/papaparse": "^5.3.14",
+    "add": "^2.0.6",
     "lodash.debounce": "^4.0.8",
     "lodash.throttle": "^4.1.1",
     "papaparse": "^5.4.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "recharts": "^2.12.7"
+    "recharts": "^2.12.7",
+    "yarn": "^1.22.22"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",

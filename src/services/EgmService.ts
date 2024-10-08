@@ -65,31 +65,33 @@ export class EgmService {
       return "matchRange";
     }
     const [start, end] = timeRange;
-    const lastSample = data[data.length - 1];
     const firstSample = data[0];
-
+    const lastSample = data[data.length - 1];
     if (firstSample.Time === start && lastSample.Time === end) {
       return "matchRange";
     } else if (lastSample.Time < start) {
       return "beforeRange";
-    } else if (firstSample.Time > end) {
-      return "afterRange";
     } else if (
       firstSample.Time <= start &&
       lastSample.Time >= start &&
       lastSample.Time <= end
     ) {
       return "lastInRange";
+    } else if (firstSample.Time > start && lastSample.Time < end) {
+      return "inRange";
+    } else if (firstSample.Time > end) {
+      return "afterRange";
+    } else if (firstSample.Time < start && lastSample.Time > end) {
+      return "middleInRange";
     } else if (
       firstSample.Time >= start &&
       firstSample.Time <= end &&
       lastSample.Time >= end
     ) {
       return "firstInRange";
-    } else if (firstSample.Time > start && lastSample.Time < end) {
-      return "inRange";
+    } else {
+      throw new Error("Invalid time range state");
     }
-    return "middleInRange";
   }
   private getSampledData(egmData: Egm): Egm {
     if (egmData.length <= this.maxSamples) {
@@ -151,7 +153,6 @@ export class EgmService {
         onComplete(this.getSampledData(this.filteredData));
       }
     };
-
     switch (timeRangeState) {
       case "matchRange":
         // __[🟢🟢🟢🟢🟢]__

@@ -33,8 +33,11 @@ type TimeRangeState =
 // ___〇〇〇〇〇〇[🔴🔴🔴🔴🔴]
 
 export class EgmService {
+  // filteredData: it will store the data that is in the time range, after iterating over the chunks
   private filteredData: Egm;
+  // maxSamples: the maximum number of samples that we want to show in the UI
   private readonly maxSamples: number;
+  // initialTime: the time of the first sample of the first chunk
   private initialTime: number | undefined;
   // timeRangePosition is the position of the time range (the window) in the file (start, middle or end of the file)
   private timeRangePosition: TimeRangePosition = "start";

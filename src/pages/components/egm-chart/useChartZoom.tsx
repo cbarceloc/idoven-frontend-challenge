@@ -34,8 +34,10 @@ export function useChartZoom({
     if (refAreaLeft === null || refAreaRight === null) return;
     if (refAreaLeft > refAreaRight) {
       onNewZoom([refAreaRight, refAreaLeft]);
+    } else if (refAreaLeft < refAreaRight) {
+      onNewZoom([refAreaLeft, refAreaRight]);
     }
-    onNewZoom([refAreaLeft, refAreaRight]);
+
     setRefAreaLeft(null);
     setRefAreaRight(null);
   };

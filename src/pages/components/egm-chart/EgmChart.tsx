@@ -13,6 +13,16 @@ import { useChartZoom } from "./useChartZoom";
 import { Egm, TimeRange } from "../../../types";
 import EgmChartButtons from "./EgmChartButtons";
 import { CardContent, Card, Stack } from "@mui/material";
+import { useChartLegend } from "./useChartLegend";
+
+type Props = {
+  egm: Egm;
+  onChangeTimeRange: (range: TimeRange) => void;
+  isLoading: boolean;
+  isPrevDisabled: boolean;
+  isNextDisabled: boolean;
+};
+const colors = ["#109242", "#f98140", "#4f3986", "#be2359", "#397f86"];
 
 const EgmChart = ({
   egm,
@@ -20,13 +30,8 @@ const EgmChart = ({
   isLoading,
   isPrevDisabled,
   isNextDisabled,
-}: {
-  egm: Egm;
-  onChangeTimeRange: (range: TimeRange) => void;
-  isLoading: boolean;
-  isPrevDisabled: boolean;
-  isNextDisabled: boolean;
-}) => {
+}: Props) => {
+  // zoom control
   const {
     handleMouseDownInChart,
     handleMouseMoveInChart,
@@ -37,9 +42,18 @@ const EgmChart = ({
     chartData: egm,
     onNewZoom: onChangeTimeRange,
   });
+  // legend control
+  const {
+    seriesStatuses,
+    handleClickLegend,
+    handleMouseOutLegend,
+    handleMouseOverLegend,
+    getChartColor,
+  } = useChartLegend({ data: egm, colors });
   const timeRange = egm.length
     ? ([egm[0].Time, egm[egm.length - 1].Time] as TimeRange)
     : undefined;
+
   return (
     <div>
       <Card>
@@ -58,47 +72,38 @@ const EgmChart = ({
               <XAxis dataKey="Time" type="number" domain={timeRange} />
               <YAxis />
               <Tooltip />
-              <Legend />
-              <Line
-                type="linear"
-                dataKey="1"
-                stroke="#82ca9d"
-                animationDuration={300}
-                connectNulls
-                dot={false}
+
+              <Legend
+                onClick={(data) => handleClickLegend(data.dataKey as string)}
+                onMouseOver={(data) =>
+                  handleMouseOverLegend(data.dataKey as string)
+                }
+                onMouseOut={handleMouseOutLegend}
+                payload={Object.keys(seriesStatuses).map((name) => ({
+                  id: name,
+                  dataKey: name,
+                  type: "circle",
+                  value: "chart " + name,
+                  color: getChartColor(name),
+                }))}
               />
-              <Line
-                dataKey="2"
-                stroke="#d4b32d"
-                strokeWidth={2}
-                animationDuration={300}
-                connectNulls
-                dot={false}
-              />
-              <Line
-                type="linear"
-                dataKey="3"
-                stroke="#4f3986"
-                animationDuration={300}
-                connectNulls
-                dot={false}
-              />
-              <Line
-                type="linear"
-                dataKey="4"
-                stroke="#be2359"
-                animationDuration={300}
-                connectNulls
-                dot={false}
-              />
-              <Line
-                type="linear"
-                dataKey="5"
-                stroke="#397f86"
-                animationDuration={300}
-                connectNulls
-                dot={false}
-              />
+
+              {Object.keys(seriesStatuses).map((key: string) => {
+                if (!seriesStatuses[key].isVisible) {
+                  return null;
+                }
+                return (
+                  <Line
+                    type="linear"
+                    dataKey={key}
+                    stroke={getChartColor(key)}
+                    animationDuration={300}
+                    connectNulls
+                    dot={false}
+                  />
+                );
+              })}
+
               {refArea && (
                 <ReferenceArea x1={refArea.left} x2={refArea.right} />
               )}

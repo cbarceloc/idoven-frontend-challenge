@@ -12,7 +12,7 @@ const EgmPage: React.FC = () => {
   if (!file) {
     return <FileUpload file={file} onFileUpload={setFile} />;
   }
-  if (data.length === 0 && isLoading) {
+  if (data.length === 0) {
     return <div>loading...</div>;
   }
   return (

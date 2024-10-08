@@ -1,13 +1,13 @@
 import { Egm, TimeRange, TimeRangePosition } from "../types";
 
 // COMMENTS WIKI
-// start: Represent the start of the time range
-// end: Represent the end of the time range
-// 〇: Represent the time range without samples
-// 🟢: Represent a sample that is in the time range
-// 🔴: Represent a sample that outside the time range
-// []: Represent the current chunk or data to parse
-// ___: Represent the data that is outside the current chunk and is outside the time range
+// start: Represents the start of the time range
+// end: Represents the end of the time range
+// 〇: Represents the time range without samples
+// 🟢: Represents a sample that is in the time range
+// 🔴: Represents a sample that is outside the time range
+// []: Represents the current chunk or data to parse
+// ___: Represents the data that is outside the current chunk and is outside the time range
 
 type TimeRangeState =
   | "matchRange"

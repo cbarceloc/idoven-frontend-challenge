@@ -40,13 +40,15 @@ export function useChartLegend({
       return "black";
     }
     const { isActive, isVisible } = seriesStatuses[dataKey];
-
+    const color = colors[serieNames.indexOf(dataKey) % colors.length];
     if (isVisible && isActive) {
-      return colors[serieNames.indexOf(dataKey) % colors.length];
+      return color + "80";
     } else if (isVisible && !isActive) {
-      return colors[serieNames.indexOf(dataKey) % colors.length] + "95";
+      return color;
+    } else if (!isVisible && isActive) {
+      return color;
     }
-    return "rgb(173, 180, 187)";
+    return "rgb(206, 206, 214)";
   }
 
   const [seriesStatuses, setSeriesStatuses] = useState(initialSeriesStatuses);
@@ -69,7 +71,7 @@ export function useChartLegend({
       (acc: SeriesStatuses, key: string) => {
         acc[key] = {
           ...seriesStatuses[key],
-          isActive: true,
+          isActive: false,
         };
         return acc;
       },

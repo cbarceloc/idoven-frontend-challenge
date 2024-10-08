@@ -143,7 +143,7 @@ export class EgmService {
     const timeRange = this.getCuratedTimeRange(data, propsTimeRange);
     const timeRangeState = this.getTimeRangeState(data, timeRange);
     const completeDataParsing = () => {
-      this.updateTimeRangePosition(data);
+      this.updateTimeRangePosition(this.filteredData);
       if (onChangeTimeRangePosition) {
         onChangeTimeRangePosition(this.timeRangePosition);
       }

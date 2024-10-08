@@ -5,13 +5,13 @@ import Button from "@mui/material/Button";
 export default function EgmChartButtons({
   timeRange,
   onChangeTimeRange,
-  isNextEnabled,
-  isPrevEnabled,
+  isNextDisabled,
+  isPrevDisabled,
 }: {
   timeRange: TimeRange;
   onChangeTimeRange: (range: TimeRange) => void;
-  isNextEnabled: boolean;
-  isPrevEnabled: boolean;
+  isNextDisabled: boolean;
+  isPrevDisabled: boolean;
 }) {
   function getTimeDuration() {
     return timeRange[1] - timeRange[0];
@@ -37,7 +37,7 @@ export default function EgmChartButtons({
         onClick={handleClickPrev}
         variant="contained"
         sx={{ width: 200 }}
-        disabled={!isPrevEnabled}
+        disabled={isPrevDisabled}
       >
         Prev
       </Button>
@@ -45,7 +45,7 @@ export default function EgmChartButtons({
         onClick={handleClickNext}
         variant="contained"
         sx={{ width: 200 }}
-        disabled={!isNextEnabled}
+        disabled={isNextDisabled}
       >
         Next
       </Button>

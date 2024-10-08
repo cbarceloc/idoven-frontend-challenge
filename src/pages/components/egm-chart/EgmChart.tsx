@@ -18,12 +18,14 @@ const EgmChart = ({
   egm,
   onChangeTimeRange,
   isLoading,
-  isPrevEnabled,
+  isPrevDisabled,
+  isNextDisabled,
 }: {
   egm: Egm;
   onChangeTimeRange: (range: TimeRange) => void;
   isLoading: boolean;
-  isPrevEnabled: boolean;
+  isPrevDisabled: boolean;
+  isNextDisabled: boolean;
 }) => {
   const {
     handleMouseDownInChart,
@@ -123,8 +125,8 @@ const EgmChart = ({
       </Card>
       {!!timeRange && (
         <EgmChartButtons
-          isNextEnabled={!isLoading}
-          isPrevEnabled={isPrevEnabled && !isLoading}
+          isPrevDisabled={isPrevDisabled}
+          isNextDisabled={isNextDisabled}
           timeRange={timeRange}
           onChangeTimeRange={onChangeTimeRange}
         ></EgmChartButtons>

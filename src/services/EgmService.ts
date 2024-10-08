@@ -36,7 +36,7 @@ export class EgmService {
   private filteredData: Egm;
   private readonly maxSamples: number;
   private initialTime: number | undefined;
-  private nInitialSamples: number = 0;
+  // timeRangePosition is the position of the time range (the window) in the file (start, middle or end of the file)
   private timeRangePosition: TimeRangePosition = "start";
 
   constructor(props: { nParsedSamples: number }) {
@@ -45,8 +45,8 @@ export class EgmService {
   }
 
   getTimeRangePosition(data: Egm): TimeRangePosition {
-    if (this.initialTime === undefined || this.nInitialSamples === 0) {
-      throw new Error("Initial time and nInitialSamples must be defined");
+    if (this.initialTime === undefined) {
+      throw new Error("Initial time must be defined");
     }
     const firstSample = data[0];
     if (firstSample.Time <= this.initialTime) {
@@ -114,7 +114,6 @@ export class EgmService {
   private initParamsOnFirstParse(data: Egm) {
     if (this.initialTime === undefined) {
       this.initialTime = data[0].Time;
-      this.nInitialSamples = data.length;
     }
   }
   private updateTimeRangePosition(data: Egm) {
